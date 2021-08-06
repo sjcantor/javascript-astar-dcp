@@ -1,22 +1,5 @@
-// javascript-astar 0.4.1
-// http://github.com/bgrins/javascript-astar
-// Freely distributable under the MIT License.
-// Implements the astar search algorithm in javascript using a Binary Heap.
-// Includes Binary Heap (with modifications) from Marijn Haverbeke.
-// http://eloquentjavascript.net/appendix2.html
-(function(definition) {
-  /* global module, define */
-  if (typeof module === 'object' && typeof module.exports === 'object') {
-    module.exports = definition();
-  } else if (typeof define === 'function' && define.amd) {
-    define([], definition);
-  } else {
-    var exports = definition();
-    window.astar = exports.astar;
-    window.Graph = exports.Graph;
-  }
-})(function() {
 
+let randomScale = 25000;
 function pathTo(node) {
   var curr = node;
   var path = [];
@@ -45,7 +28,8 @@ var astar = {
   * @param {Function} [options.heuristic] Heuristic function (see
   *          astar.heuristics).
   */
-  search: function(graph, start, end, options) {
+  search: function(data) {
+    var {graph, start, end, options} = data;
     graph.cleanDirty();
     options = options || {};
     var heuristic = options.heuristic || astar.heuristics.manhattan;
@@ -126,16 +110,18 @@ var astar = {
   // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
   heuristics: {
     manhattan: function(pos0, pos1) {
+      let randomNumber = Math.floor(Math.random() * randomScale);
       var d1 = Math.abs(pos1.x - pos0.x);
       var d2 = Math.abs(pos1.y - pos0.y);
-      return d1 + d2;
+      return randomNumber + (d1 + d2);
     },
     diagonal: function(pos0, pos1) {
+      let randomNumber = Math.floor(Math.random() * randomScale);
       var D = 1;
       var D2 = Math.sqrt(2);
       var d1 = Math.abs(pos1.x - pos0.x);
       var d2 = Math.abs(pos1.y - pos0.y);
-      return (D * (d1 + d2)) + ((D2 - (2 * D)) * Math.min(d1, d2));
+      return randomNumber + (D * (d1 + d2)) + ((D2 - (2 * D)) * Math.min(d1, d2));
     }
   },
   cleanNode: function(node) {
@@ -395,10 +381,3 @@ BinaryHeap.prototype = {
     }
   }
 };
-
-return {
-  astar: astar,
-  Graph: Graph
-};
-
-});

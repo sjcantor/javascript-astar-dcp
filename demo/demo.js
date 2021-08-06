@@ -66,10 +66,10 @@ $(function() {
 });
 
 var css = { start: "start", finish: "finish", wall: "wall", active: "active", best: "best" };
-
 function GraphSearch($graph, options, implementation) {
     this.$graph = $graph;
-    this.search = implementation;
+    this.search = astar.search;
+    this.workerfn = astar.search.toString();
     this.opts = $.extend({wallFrequency:0.1, debug:true, gridSize:10}, options);
     this.initialize();
 }
@@ -134,7 +134,40 @@ GraphSearch.prototype.initialize = function() {
         self.cellClicked($(this));
     });
 };
-GraphSearch.prototype.cellClicked = function($end) {
+async function main(data, workerFunction) {
+    const job = window.dcp.compute.for(
+        new Array(2).fill(data),
+        workerFunction,
+    );
+
+    job.on('console', (ev) => {
+    console.log(ev)
+    })
+
+    job.on('accepted', () => {
+    console.log(` - Job accepted by scheduler, waiting for results`);
+    console.log(` - Job has id ${job.id}`);
+    startTime = Date.now();
+    });
+
+    job.on('readystatechange', (arg) => {
+    console.log(`new ready state: ${arg}`);
+    });
+
+    job.on('result', (ev) => {
+    console.log(ev)
+    });
+    
+    job.on('error', (ev)=>{console.log('error',ev)})
+
+    job.public.name = 'Puzzle';
+    
+    const results = await job.exec(0.0000001);
+    console.log('results=', Array.from(results));
+    return Array.from(results);
+    
+}
+GraphSearch.prototype.cellClicked = async function($end) {
 
     var end = this.nodeFromElement($end);
 
@@ -149,12 +182,16 @@ GraphSearch.prototype.cellClicked = function($end) {
 
     var sTime = performance ? performance.now() : new Date().getTime();
 
-    var path = this.search(this.graph, start, end, {
-        closest: this.opts.closest
-    });
-    var path2 = this.search(this.graph, start, end, {
-        closest: this.opts.closest
-    });
+    
+    let p = await main({graph: this.graph, start: start, end: end, options: {closest: this.opts.closest}},this.workerfn )
+    let path = p[0];
+    let path2 = p[1];
+    // var path = this.search(this.graph, start, end, {
+    //     closest: this.opts.closest
+    // });
+    // var path2 = this.search(this.graph, start, end, {
+    //     closest: this.opts.closest
+    // });
 
     var fTime = performance ? performance.now() : new Date().getTime(),
         duration = (fTime-sTime).toFixed(2);
