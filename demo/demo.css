@@ -165,6 +165,9 @@ pre span.key {
 .grid_item.active {
 	background-color: #FF703F;
 }
+.grid_item.best {
+  background-color: blue;
+}
 .grid_item.finish {
 
 }

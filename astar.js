@@ -33,6 +33,9 @@ function getHeap() {
   });
 }
 
+let randomScale = 25000;
+console.log('random scale:', randomScale);
+
 var astar = {
   /**
   * Perform an A* Search on a graph given a start and end node.
@@ -126,16 +129,18 @@ var astar = {
   // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
   heuristics: {
     manhattan: function(pos0, pos1) {
+      let randomNumber = Math.floor(Math.random() * randomScale);
       var d1 = Math.abs(pos1.x - pos0.x);
       var d2 = Math.abs(pos1.y - pos0.y);
-      return d1 + d2;
+      return randomNumber + (d1 + d2);
     },
     diagonal: function(pos0, pos1) {
+      let randomNumber = Math.floor(Math.random() * randomScale);
       var D = 1;
       var D2 = Math.sqrt(2);
       var d1 = Math.abs(pos1.x - pos0.x);
       var d2 = Math.abs(pos1.y - pos0.y);
-      return (D * (d1 + d2)) + ((D2 - (2 * D)) * Math.min(d1, d2));
+      return randomNumber + (D * (d1 + d2)) + ((D2 - (2 * D)) * Math.min(d1, d2));
     }
   },
   cleanNode: function(node) {

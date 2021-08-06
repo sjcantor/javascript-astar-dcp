@@ -65,7 +65,7 @@ $(function() {
 
 });
 
-var css = { start: "start", finish: "finish", wall: "wall", active: "active" };
+var css = { start: "start", finish: "finish", wall: "wall", active: "active", best: "best" };
 
 function GraphSearch($graph, options, implementation) {
     this.$graph = $graph;
@@ -152,6 +152,10 @@ GraphSearch.prototype.cellClicked = function($end) {
     var path = this.search(this.graph, start, end, {
         closest: this.opts.closest
     });
+    var path2 = this.search(this.graph, start, end, {
+        closest: this.opts.closest
+    });
+
     var fTime = performance ? performance.now() : new Date().getTime(),
         duration = (fTime-sTime).toFixed(2);
 
@@ -162,7 +166,15 @@ GraphSearch.prototype.cellClicked = function($end) {
     else {
         $("#message").text("search took " + duration + "ms.");
         this.drawDebugInfo();
-        this.animatePath(path);
+        if (path.length < path2.length) {
+            console.log('first solution is better:', path.length)
+            this.animatePath(path, true);
+            this.animatePath(path2);
+        } else {
+            console.log('second solution is better:', path2.length)
+            this.animatePath(path);
+            this.animatePath(path2, true);
+        }
     }
 };
 GraphSearch.prototype.drawDebugInfo = function() {
@@ -198,7 +210,7 @@ GraphSearch.prototype.animateNoPath = function() {
     };
     jiggle(15);
 };
-GraphSearch.prototype.animatePath = function(path) {
+GraphSearch.prototype.animatePath = function(path, isBest) {
     var grid = this.grid,
         timeout = 1000 / grid.length,
         elementFromNode = function(node) {
@@ -226,7 +238,10 @@ GraphSearch.prototype.animatePath = function(path) {
         if(i >= path.length) { // Finished showing path, now remove
             return removeClass(path, 0);
         }
-        elementFromNode(path[i]).addClass(css.active);
+
+        if (isBest) elementFromNode(path[i]).addClass(css.best);
+        else elementFromNode(path[i]).addClass(css.active);
+        
         setTimeout(function() {
             addClass(path, i+1);
         }, timeout*path[i].getCost());
