@@ -140,7 +140,7 @@ var astar = {
  * @param {Object} [options]
  * @param {bool} [options.diagonal] Specifies whether diagonal moves are allowed
  */
-function Graph(gridIn, options) {
+var Graph = function (gridIn, options) {
   options = options || {};
   this.nodes = [];
   this.diagonal = !!options.diagonal;
