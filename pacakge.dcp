@@ -1,0 +1,7 @@
+{
+  "name": "sam_astar",
+  "version": "1.0.0",
+  "files": {
+    "/home/sam/git/javascript-astar-dcp/astar-dcp-package.js": "astar-dcp-package.js",
+  }
+}

@@ -134,7 +134,14 @@ GraphSearch.prototype.initialize = function() {
         self.cellClicked($(this));
     });
 };
-async function main(data, workerFunction) {
+async function main(data) {
+
+    function workerFunction(input) {
+        let astar = require('./astar');
+        console.log('in worker, input:', input);
+        astar.search(input);
+    }
+
     const job = window.dcp.compute.for(
         new Array(2).fill(data),
         workerFunction,
@@ -160,9 +167,11 @@ async function main(data, workerFunction) {
     
     job.on('error', (ev)=>{console.log('error',ev)})
 
+    job.requires('./astar.js');
+
     job.public.name = 'Puzzle';
     
-    const results = await job.exec(0.0000001);
+    const results = await job.localExec();
     console.log('results=', Array.from(results));
     return Array.from(results);
     
