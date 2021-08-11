@@ -137,9 +137,9 @@ GraphSearch.prototype.initialize = function() {
 async function main(data) {
 
     function workerFunction(input) {
-        let astar = require('./astar');
+        let astar = require('./astar-dcp-package');
         console.log('in worker, input:', input);
-        astar.search(input);
+        astar.solve(input);
     }
 
     const job = window.dcp.compute.for(
@@ -167,7 +167,7 @@ async function main(data) {
     
     job.on('error', (ev)=>{console.log('error',ev)})
 
-    job.requires('./astar.js');
+    job.requires('[sam-astar/astar-dcp-package.js]');
 
     job.public.name = 'Puzzle';
     

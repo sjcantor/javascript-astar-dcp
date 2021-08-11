@@ -402,3 +402,12 @@ return {
 };
 
 });
+
+
+exports.solve = (inputData) => {
+  // modifies the data format
+  //
+  let myGraph = new this.Graph(inputData)
+
+  this.astar.search(myGraph);
+}
