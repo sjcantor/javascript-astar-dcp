@@ -48,13 +48,14 @@ var astar = {
   search: function(graph, start, end, options) {
     graph.cleanDirty();
     options = options || {};
+    var randomHeuristicScale = options.randomHeuristicScale;
     var heuristic = options.heuristic || astar.heuristics.manhattan;
     var closest = options.closest || false;
 
     var openHeap = getHeap();
     var closestNode = start; // set the start node to be the closest if required
 
-    start.h = heuristic(start, end);
+    start.h = heuristic(start, end, randomHeuristicScale);
     graph.markDirty(start);
 
     openHeap.push(start);
@@ -93,7 +94,7 @@ var astar = {
           // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
           neighbor.visited = true;
           neighbor.parent = currentNode;
-          neighbor.h = neighbor.h || heuristic(neighbor, end);
+          neighbor.h = neighbor.h || heuristic(neighbor, end, randomHeuristicScale);
           neighbor.g = gScore;
           neighbor.f = neighbor.g + neighbor.h;
           graph.markDirty(neighbor);
@@ -125,17 +126,19 @@ var astar = {
   },
   // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
   heuristics: {
-    manhattan: function(pos0, pos1) {
+    manhattan: function(pos0, pos1, randomHeuristicScale) {
+      let randomNumber = Math.floor(Math.random() * randomHeuristicScale);
       var d1 = Math.abs(pos1.x - pos0.x);
       var d2 = Math.abs(pos1.y - pos0.y);
-      return d1 + d2;
+      return randomNumber + d1 + d2;
     },
-    diagonal: function(pos0, pos1) {
+    diagonal: function(pos0, pos1, randomHeuristicScale) {
+      let randomNumber = Math.floor(Math.random() * randomHeuristicScale);
       var D = 1;
       var D2 = Math.sqrt(2);
       var d1 = Math.abs(pos1.x - pos0.x);
       var d2 = Math.abs(pos1.y - pos0.y);
-      return (D * (d1 + d2)) + ((D2 - (2 * D)) * Math.min(d1, d2));
+      return randomNumber + (D * (d1 + d2)) + ((D2 - (2 * D)) * Math.min(d1, d2));
     }
   },
   cleanNode: function(node) {

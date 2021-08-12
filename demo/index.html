@@ -62,6 +62,12 @@
 	    		<label for="displayWeights">Display weight values?</label>
 	    		<input type="checkbox" name="displayWeights" id="displayWeights" />
 	    		<br />
+					<label for="enableDCP">Enable DCP?</label>
+	    		<input type="checkbox" name="enableDCP" id="enableDCP" />
+	    		<br />
+					<label for="randomHeuristicScale">Heuristic Stochasticity</label>
+	    		<input type="number" name="randomHeuristicScale" id="randomHeuristicScale" value=20 />
+	    		<br />
 	    		<input type="button" id="btnGenerate" value="Generate New Map" />
 	    		<fieldset id='weightsKey'>
 	    			<legend>Key:</legend>
@@ -87,8 +93,8 @@
 
 	<script type='text/javascript' src='jquery-1.7.1.min.js'></script>
 	<script type='text/javascript' src='../astar.js'></script>
-	<script type='text/javascript' src='../helpers.js'></script>
-  <script src="http://scheduler.cantor.office.kingsds.network/dcp-client/dcp-client.js"></script>
+	<!-- <script type='text/javascript' src='../helpers.js'></script> -->
+  <script src="http://scheduler.distributed.computer/dcp-client/dcp-client.js"></script>
 	<!--<script type='text/javascript' src='../dist/astar-concat.js'></script>-->
 	<script type='text/javascript' src='demo.js'></script>
 </body>

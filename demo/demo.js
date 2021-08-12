@@ -137,7 +137,7 @@ GraphSearch.prototype.initialize = function() {
 async function main(data) {
 
     function workerFunction(input) {
-        let astar = require('./astar-dcp-package');
+        let astar = require('astar-dcp-package.js');
         console.log('in worker, input:', input);
         astar.solve(input);
     }
@@ -167,7 +167,7 @@ async function main(data) {
     
     job.on('error', (ev)=>{console.log('error',ev)})
 
-    job.requires('[sam-astar/astar-dcp-package.js]');
+    job.requires(['sam_astar/astar-dcp-package.js']);
 
     job.public.name = 'Puzzle';
     
@@ -191,35 +191,47 @@ GraphSearch.prototype.cellClicked = async function($end) {
 
     var sTime = performance ? performance.now() : new Date().getTime();
 
-    
-    let p = await main({graph: this.graph, start: start, end: end, options: {closest: this.opts.closest}},this.workerfn )
-    let path = p[0];
-    let path2 = p[1];
-    // var path = this.search(this.graph, start, end, {
-    //     closest: this.opts.closest
-    // });
-    // var path2 = this.search(this.graph, start, end, {
-    //     closest: this.opts.closest
-    // });
+    let numPaths = 4;
+    let paths = [];
+    let path, path2;
+    let randomHeuristicScale = document.getElementById("randomHeuristicScale").value;
+    console.log('scale:', randomHeuristicScale);
+
+    if ($("#enableDCP").prop("checked")) {
+        let p = await main({graph: this.graph, start: start, end: end, options: {closest: this.opts.closest}},this.workerfn )
+        paths = paths.concat(p);
+    } else {
+        console.log('running without dcp...', this.graph)
+        for (let i = 0; i < numPaths; i++) {
+            path = this.search(this.graph, start, end, {
+                closest: this.opts.closest,
+                randomHeuristicScale: 20,
+            });
+            paths.push(path);
+        }
+    }
+    console.log('paths:', paths)
 
     var fTime = performance ? performance.now() : new Date().getTime(),
         duration = (fTime-sTime).toFixed(2);
 
-    if(path.length === 0) {
+    if(paths[0].length === 0) {
         $("#message").text("couldn't find a path (" + duration + "ms)");
         this.animateNoPath();
     }
     else {
         $("#message").text("search took " + duration + "ms.");
         this.drawDebugInfo();
-        if (path.length < path2.length) {
-            console.log('first solution is better:', path.length)
-            this.animatePath(path, true);
-            this.animatePath(path2);
-        } else {
-            console.log('second solution is better:', path2.length)
-            this.animatePath(path);
-            this.animatePath(path2, true);
+        let pathLengths = [];
+        for (let i in paths) {
+            pathLengths.push(paths[i].length);
+        }
+        console.log('path lengths:', pathLengths, Math.min(...pathLengths))
+        let bestPathIndex = pathLengths.indexOf(Math.min(...pathLengths));
+        console.log('best path is:', bestPathIndex)
+        for (let i in paths) {
+            console.log(i, bestPathIndex, i == bestPathIndex)
+            this.animatePath(paths[i], i == bestPathIndex ? true : false)
         }
     }
 };
