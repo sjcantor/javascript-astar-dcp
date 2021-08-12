@@ -1,3 +1,5 @@
+module.declare([], function(require, exports, module) {
+
 // javascript-astar 0.4.1
 // http://github.com/bgrins/javascript-astar
 // Freely distributable under the MIT License.
@@ -12,8 +14,8 @@
     define([], definition);
   } else {
     var exports = definition();
-    window.astar = exports.astar;
-    window.Graph = exports.Graph;
+    // window.astar = exports.astar;
+    // window.Graph = exports.Graph;
   }
 })(function() {
 
@@ -407,7 +409,10 @@ return {
 exports.solve = (inputData) => {
   // modifies the data format
   //
-  let myGraph = new this.Graph(inputData)
+  // let myGraph = new this.Graph(inputData)
 
-  this.astar.search(myGraph);
+  // this.astar.search(myGraph);
+  console.log('this is my input data inside the module:', inputData)
 }
+
+}); // module.declare
