@@ -5,6 +5,8 @@
 */
 /* global Graph, astar, $ */
 
+let globalNodes;
+
 var WALL = 0,
     performance = window.performance;
 
@@ -69,7 +71,6 @@ var css = { start: "start", finish: "finish", wall: "wall", active: "active", be
 function GraphSearch($graph, options, implementation) {
     this.$graph = $graph;
     this.search = astar.search;
-    this.workerfn = astar.search.toString();
     this.opts = $.extend({wallFrequency:0.1, debug:true, gridSize:10}, options);
     this.initialize();
 }
@@ -126,6 +127,8 @@ GraphSearch.prototype.initialize = function() {
         nodes.push(nodeRow);
     }
 
+    globalNodes = nodes;
+
     this.graph = new Graph(nodes);
 
     // bind cell event, set start/wall positions
@@ -138,12 +141,12 @@ async function main(data) {
 
     function workerFunction(input) {
         let astar = require('astar-dcp-package.js');
-        console.log('in worker, input:', input);
-        astar.solve(input);
+        let parsedInput = JSON.parse(input);
+        return astar.solve(parsedInput);
     }
 
     const job = window.dcp.compute.for(
-        new Array(2).fill(data),
+        new Array(4).fill(data),
         workerFunction,
     );
 
@@ -195,17 +198,47 @@ GraphSearch.prototype.cellClicked = async function($end) {
     let paths = [];
     let path, path2;
     let randomHeuristicScale = document.getElementById("randomHeuristicScale").value;
+    if (randomHeuristicScale == 123456789) {
+        randomHeuristicScale = NaN;
+    }
     console.log('scale:', randomHeuristicScale);
 
+    function GridNode(x, y, weight) {
+        this.x = x;
+        this.y = y;
+        this.weight = weight;
+    }
+
+    GridNode.prototype.toString = function() {
+        return "[" + this.x + " " + this.y + "]";
+    };
+    
+    GridNode.prototype.getCost = function(fromNeighbor) {
+        // Take diagonal weight into consideration.
+        if (fromNeighbor && fromNeighbor.x != this.x && fromNeighbor.y != this.y) {
+            return this.weight * 1.41421;
+        }
+        return this.weight;
+    };
+    
+    GridNode.prototype.isWall = function() {
+        return this.weight === 0;
+    };
+
     if ($("#enableDCP").prop("checked")) {
-        let p = await main({graph: this.graph, start: start, end: end, options: {closest: this.opts.closest}},this.workerfn )
-        paths = paths.concat(p);
+        let p = await main({nodes: globalNodes, start: start, end: end, options: {closest: true, randomHeuristicScale: randomHeuristicScale}} );
+        for (let slice of p) {
+            for (let pnode in slice) {
+                slice[pnode] = new GridNode(slice[pnode].x, slice[pnode].y, slice[pnode].weight)
+            }
+            paths.push(slice);
+        }
     } else {
-        console.log('running without dcp...', this.graph)
+        console.log('running without dcp...', this.graph, start, end)
         for (let i = 0; i < numPaths; i++) {
             path = this.search(this.graph, start, end, {
                 closest: this.opts.closest,
-                randomHeuristicScale: 20,
+                randomHeuristicScale: randomHeuristicScale,
             });
             paths.push(path);
         }

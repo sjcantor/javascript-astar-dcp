@@ -6,18 +6,18 @@ module.declare([], function(require, exports, module) {
 // Implements the astar search algorithm in javascript using a Binary Heap.
 // Includes Binary Heap (with modifications) from Marijn Haverbeke.
 // http://eloquentjavascript.net/appendix2.html
-(function(definition) {
-  /* global module, define */
-  if (typeof module === 'object' && typeof module.exports === 'object') {
-    module.exports = definition();
-  } else if (typeof define === 'function' && define.amd) {
-    define([], definition);
-  } else {
-    var exports = definition();
-    // window.astar = exports.astar;
-    // window.Graph = exports.Graph;
-  }
-})(function() {
+// (function(definition) {
+//   /* global module, define */
+//   if (typeof module === 'object' && typeof module.exports === 'object') {
+//     module.exports = definition();
+//   } else if (typeof define === 'function' && define.amd) {
+//     define([], definition);
+//   } else {
+//     var exports = definition();
+//     // window.astar = exports.astar;
+//     // window.Graph = exports.Graph;
+//   }
+// })(function() {
 
 function pathTo(node) {
   var curr = node;
@@ -50,15 +50,15 @@ var astar = {
   search: function(graph, start, end, options) {
     graph.cleanDirty();
     options = options || {};
+    var randomHeuristicScale = +options.randomHeuristicScale;
     var heuristic = options.heuristic || astar.heuristics.manhattan;
     var closest = options.closest || false;
 
     var openHeap = getHeap();
     var closestNode = start; // set the start node to be the closest if required
 
-    start.h = heuristic(start, end);
+    start.h = heuristic(start, end, randomHeuristicScale);
     graph.markDirty(start);
-
     openHeap.push(start);
 
     while (openHeap.size() > 0) {
@@ -95,7 +95,7 @@ var astar = {
           // Found an optimal (so far) path to this node.  Take score for node to see how good it is.
           neighbor.visited = true;
           neighbor.parent = currentNode;
-          neighbor.h = neighbor.h || heuristic(neighbor, end);
+          neighbor.h = neighbor.h || heuristic(neighbor, end, randomHeuristicScale);
           neighbor.g = gScore;
           neighbor.f = neighbor.g + neighbor.h;
           graph.markDirty(neighbor);
@@ -127,10 +127,11 @@ var astar = {
   },
   // See list of heuristics: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html
   heuristics: {
-    manhattan: function(pos0, pos1) {
+    manhattan: function(pos0, pos1, randomHeuristicScale) {
+      let randomNumber = Math.floor(Math.random() * randomHeuristicScale);
       var d1 = Math.abs(pos1.x - pos0.x);
       var d2 = Math.abs(pos1.y - pos0.y);
-      return d1 + d2;
+      return randomNumber + d1 + d2;
     },
     diagonal: function(pos0, pos1) {
       var D = 1;
@@ -398,21 +399,32 @@ BinaryHeap.prototype = {
   }
 };
 
-return {
-  astar: astar,
-  Graph: Graph
-};
 
-});
 
 
 exports.solve = (inputData) => {
-  // modifies the data format
-  //
-  // let myGraph = new this.Graph(inputData)
+  let startCopy = inputData.start;
+  let endCopy = inputData.end;
+  inputData.graph = new Graph(inputData.nodes);
 
-  // this.astar.search(myGraph);
-  console.log('this is my input data inside the module:', inputData)
+  inputData.start = new GridNode(startCopy.x, startCopy.y, startCopy.weight);
+  inputData.end = new GridNode(endCopy.x, endCopy.y, endCopy.weight);
+
+  inputData.start.f = startCopy.f;
+  inputData.start.f = startCopy.f;
+  inputData.start.f = startCopy.f;
+  inputData.start.visited = startCopy.visited;
+  inputData.start.parent = startCopy.parent;
+  inputData.end.f = endCopy.f;
+  inputData.end.f = endCopy.f;
+  inputData.end.f = endCopy.f;
+  inputData.end.visited = endCopy.visited;
+  inputData.end.parent = endCopy.parent;
+
+
+  let res = astar.search(inputData.graph, inputData.start, inputData.end, inputData.options);
+
+  return res;
 }
 
 }); // module.declare

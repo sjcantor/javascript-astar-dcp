@@ -401,7 +401,8 @@ BinaryHeap.prototype = {
 
 return {
   astar: astar,
-  Graph: Graph
+  Graph: Graph,
+  GridNode: GridNode
 };
 
 });

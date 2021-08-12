@@ -1,6 +1,6 @@
 {
 	"name": "sam_astar",
-	"version": "1.0.1",
+	"version": "1.0.43",
 	"files": {
 		"/home/cantor/git/javascript-astar-dcp/astar-dcp-package.js": "astar-dcp-package.js"
 	}
