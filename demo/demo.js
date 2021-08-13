@@ -140,13 +140,21 @@ GraphSearch.prototype.initialize = function() {
 async function main(data) {
 
     function workerFunction(input) {
+        progress();
         let astar = require('astar-dcp-package.js');
+        progress();
         let parsedInput = JSON.parse(input);
+        progress();
         return astar.solve(parsedInput);
     }
 
+    let numSlices = +document.getElementById('numPaths').value;
+    console.log('numpaths:', numSlices, typeof(numSlices));
+    let inputData = new Array(numSlices).fill(data);
+    console.log('input data:', inputData)
+
     const job = window.dcp.compute.for(
-        new Array(4).fill(data),
+        inputData,
         workerFunction,
     );
 
@@ -194,9 +202,9 @@ GraphSearch.prototype.cellClicked = async function($end) {
 
     var sTime = performance ? performance.now() : new Date().getTime();
 
-    let numPaths = 4;
+    let numPaths = document.getElementById('numPaths').value;
     let paths = [];
-    let path, path2;
+
     let randomHeuristicScale = document.getElementById("randomHeuristicScale").value;
     if (randomHeuristicScale == 123456789) {
         randomHeuristicScale = NaN;
@@ -243,7 +251,6 @@ GraphSearch.prototype.cellClicked = async function($end) {
             paths.push(path);
         }
     }
-    console.log('paths:', paths)
 
     var fTime = performance ? performance.now() : new Date().getTime(),
         duration = (fTime-sTime).toFixed(2);
@@ -308,6 +315,8 @@ GraphSearch.prototype.animatePath = function(path, isBest) {
         return grid[node.x][node.y];
     };
 
+    let randomColorShift = Math.random();
+
     var self = this;
     // will add start class if final
     var removeClass = function(path, i) {
@@ -315,6 +324,7 @@ GraphSearch.prototype.animatePath = function(path, isBest) {
             return setStartClass(path, i);
         }
         elementFromNode(path[i]).removeClass(css.active);
+        elementFromNode(path[i]).attr('filter', 'brightness:(1)')
         setTimeout(function() {
             removeClass(path, i+1);
         }, timeout*path[i].getCost());
@@ -330,8 +340,14 @@ GraphSearch.prototype.animatePath = function(path, isBest) {
             return removeClass(path, 0);
         }
 
-        if (isBest) elementFromNode(path[i]).addClass(css.best);
-        else elementFromNode(path[i]).addClass(css.active);
+        if (isBest) {
+            elementFromNode(path[i]).addClass(css.best);
+        }
+        else {
+            elementFromNode(path[i]).addClass(css.active);
+            elementFromNode(path[i]).attr('filter', `brightness:(${randomColorShift})`);
+        }
+
         
         setTimeout(function() {
             addClass(path, i+1);

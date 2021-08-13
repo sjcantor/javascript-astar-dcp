@@ -1,3 +1,5 @@
+module.declare([], function(require, exports, modules) {
+
 // javascript-astar 0.4.1
 // http://github.com/bgrins/javascript-astar
 // Freely distributable under the MIT License.
@@ -424,3 +426,4 @@ exports.solve = (inputData) => {
 
   return res;
 }
+});
