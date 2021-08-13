@@ -400,27 +400,15 @@ BinaryHeap.prototype = {
 
 
 
-exports.solve = (inputData) => {
-  let startCopy = inputData.start;
-  let endCopy = inputData.end;
-  inputData.graph = new Graph(inputData.nodes);
-
-  inputData.start = new GridNode(startCopy.x, startCopy.y, startCopy.weight);
-  inputData.end = new GridNode(endCopy.x, endCopy.y, endCopy.weight);
-
-  inputData.start.f = startCopy.f;
-  inputData.start.f = startCopy.f;
-  inputData.start.f = startCopy.f;
-  inputData.start.visited = startCopy.visited;
-  inputData.start.parent = startCopy.parent;
-  inputData.end.f = endCopy.f;
-  inputData.end.f = endCopy.f;
-  inputData.end.f = endCopy.f;
-  inputData.end.visited = endCopy.visited;
-  inputData.end.parent = endCopy.parent;
+function solve (data) {
+  let nodes = data.nodes;
+  data.graph = new Graph(nodes);
+  let start = data.graph.grid[data.start.x][data.start.y]
+  let end = data.graph.grid[data.end.x][data.end.y]
 
 
-  let res = astar.search(inputData.graph, inputData.start, inputData.end, inputData.options);
+
+  let res = astar.search(data.graph, start, end, data.options);
 
   return res;
 }

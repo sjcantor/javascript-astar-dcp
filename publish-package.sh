@@ -6,6 +6,7 @@ echo > publishedFile.js
 # Add code with bravojs stuff
 sed -i '1s/^/module.declare([], function(require, exports, modules) {\n/' publishedFile.js
 echo "$(cat astar-dcp-package.js)" >> publishedFile.js
+echo 'exports.solve = solve;' >> publishedFile.js
 echo '});' >> publishedFile.js
 
 # Publish

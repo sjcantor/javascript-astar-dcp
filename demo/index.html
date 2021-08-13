@@ -47,15 +47,15 @@
 	    		</select>
 
 	    		<br />
-	    		<label for="checkDebug">Show search info?</label>
+	    		<!-- <label for="checkDebug">Show search info?</label>
 	    		<input type="checkbox" name="checkDebug" id="checkDebug" />
-	    		<br />
-	    		<label for="searchDiagonal">Allow diagonal movement?</label>
+	    		<br /> -->
+	    		<!-- <label for="searchDiagonal">Allow diagonal movement?</label>
 	    		<input type="checkbox" name="searchDiagonal" id="searchDiagonal" />
-	    		<br />
-	    		<label for="checkClosest">Closest node if target unreachable?</label>
+	    		<br /> -->
+	    		<!-- <label for="checkClosest">Closest node if target unreachable?</label>
 	    		<input type="checkbox" name="checkClosest" id="checkClosest" />
-	    		<br />
+	    		<br /> -->
 	    		<label for="generateWeights">Add random weights?</label>
 	    		<input type="checkbox" name="generateWeights" id="generateWeights" />
 	    		<br />
@@ -69,7 +69,7 @@
 	    		<input type="number" name="randomHeuristicScale" id="randomHeuristicScale" value=20 />
 	    		<br />
 					<label for="numPaths">Paths to Generate</label>
-	    		<input type="number" name="numPaths" id="numPaths" value=3 />
+	    		<input type="number" name="numPaths" id="numPaths" value=5 />
 	    		<br />
 	    		<input type="button" id="btnGenerate" value="Generate New Map" />
 	    		<fieldset id='weightsKey'>
@@ -94,11 +94,9 @@
 	</div>
 	<div id="footer"></div>
 
-	<script type='text/javascript' src='jquery-1.7.1.min.js'></script>
-	<script type='text/javascript' src='../astar.js'></script>
-	<!-- <script type='text/javascript' src='../helpers.js'></script> -->
   <script src="http://scheduler.distributed.computer/dcp-client/dcp-client.js"></script>
-	<!--<script type='text/javascript' src='../dist/astar-concat.js'></script>-->
+	<script type='text/javascript' src='jquery-1.7.1.min.js'></script>
+	<script type='text/javascript' src='../astar-dcp-package.js'></script>
 	<script type='text/javascript' src='demo.js'></script>
 </body>
 </html>

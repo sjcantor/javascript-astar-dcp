@@ -27,7 +27,7 @@ $(function() {
         closest: $checkClosest.is("checked")
     };
 
-    var grid = new GraphSearch($grid, opts, astar.search);
+    var grid = new GraphSearch($grid, opts);
 
     $("#btnGenerate").click(function() {
         grid.initialize();
@@ -68,9 +68,8 @@ $(function() {
 });
 
 var css = { start: "start", finish: "finish", wall: "wall", active: "active", best: "best" };
-function GraphSearch($graph, options, implementation) {
+function GraphSearch($graph, options) {
     this.$graph = $graph;
-    this.search = astar.search;
     this.opts = $.extend({wallFrequency:0.1, debug:true, gridSize:10}, options);
     this.initialize();
 }
@@ -233,8 +232,22 @@ GraphSearch.prototype.cellClicked = async function($end) {
         return this.weight === 0;
     };
 
+    let data = {
+        nodes: globalNodes, 
+        start: start, 
+        end: end, 
+        options: {
+            closest: true,
+            randomHeuristicScale: randomHeuristicScale,
+        }
+    }
+
+    let standardPathData = JSON.parse(JSON.stringify(data));
+    standardPathData.options.randomHeuristicScale = 0;
+    let standardPath = solve(standardPathData);
+
     if ($("#enableDCP").prop("checked")) {
-        let p = await main({nodes: globalNodes, start: start, end: end, options: {closest: true, randomHeuristicScale: randomHeuristicScale}} );
+        let p = await main(data);
         for (let slice of p) {
             for (let pnode in slice) {
                 slice[pnode] = new GridNode(slice[pnode].x, slice[pnode].y, slice[pnode].weight)
@@ -242,12 +255,9 @@ GraphSearch.prototype.cellClicked = async function($end) {
             paths.push(slice);
         }
     } else {
-        console.log('running without dcp...', this.graph, start, end)
+        console.log('running without dcp...');
         for (let i = 0; i < numPaths; i++) {
-            path = this.search(this.graph, start, end, {
-                closest: this.opts.closest,
-                randomHeuristicScale: randomHeuristicScale,
-            });
+            path = solve(JSON.parse(JSON.stringify(data)));
             paths.push(path);
         }
     }
@@ -268,9 +278,9 @@ GraphSearch.prototype.cellClicked = async function($end) {
         }
         console.log('path lengths:', pathLengths, Math.min(...pathLengths))
         let bestPathIndex = pathLengths.indexOf(Math.min(...pathLengths));
-        console.log('best path is:', bestPathIndex)
+        console.log('best path is index', bestPathIndex, 'with a score of', pathLengths[bestPathIndex])
+        console.log('standard path score is:', standardPath.length)
         for (let i in paths) {
-            console.log(i, bestPathIndex, i == bestPathIndex)
             this.animatePath(paths[i], i == bestPathIndex ? true : false)
         }
     }
